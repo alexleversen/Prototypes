@@ -11,10 +11,50 @@ drawSquares(array,true);
 function handleClick(e){
 	var i = Math.floor((e.x - 8)/SQ_SIZE);
 	var j = Math.floor((e.y - 8)/SQ_SIZE);
-	clearMatches(i,j, array[i][j]);
-	fillIn();
-	matchBuffer = [];
-	drawSquares(array,false);
+	if(isMatchingSquareAdjacent(i,j)){
+		clearMatches(i,j, array[i][j]);
+		fillIn();
+		matchBuffer = [];
+		drawSquares(array,false);
+	}
+	checkLoss();
+}
+
+function checkLoss(){
+	for(i = 0; i < GRID_SIZE; i++){
+		for(j = 0; j < GRID_SIZE; j++){
+			if(isMatchingSquareAdjacent(i,j)){
+				return;
+			}
+		}
+	}
+	lose();
+}
+
+function lose(){
+	ctx.font = "30px Arial";
+	ctx.fillStyle = "black";
+	ctx.fillText("GAME OVER",110,210);
+}
+
+function isMatchingSquareAdjacent(i,j){
+	var left = false;
+	var right = false;
+	var up = false;
+	var down = false;
+	if(j>0){
+		left = array[i][j-1] == array[i][j];
+	}
+	if(j<GRID_SIZE - 1){
+		right = array[i][j+1] == array[i][j];
+	}
+	if(i>0){
+		up = array[i-1][j] == array[i][j];
+	}
+	if(i<GRID_SIZE - 1){
+		down = array[i+1][j] == array[i][j];
+	}
+	return left || right || up || down;
 }
 
 function clearMatches(i, j, color){
@@ -83,7 +123,9 @@ function drawSquares(array, random){
 function drawSquare(i,j,num){
 	ctx.beginPath();
 	ctx.rect(i * SQ_SIZE, j * SQ_SIZE, SQ_SIZE, SQ_SIZE);
+	ctx.strokeStyle = "black";
 	ctx.fillStyle = numToColorString(num);
+	ctx.stroke();
 	ctx.fill();
 }
 

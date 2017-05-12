@@ -10,6 +10,15 @@ var matchBuffer = [];
 drawSquares(array,true);
 updateScore();
 
+function autoPlay(){
+	setInterval(clickNext,10);
+}
+
+function clickNext(){
+	var e = {x: randInt(400)+8, y: randInt(400)+8};
+	handleClick(e);
+}
+
 function handleClick(e){
 	var i = Math.floor((e.x - 8)/SQ_SIZE);
 	var j = Math.floor((e.y - 8)/SQ_SIZE);

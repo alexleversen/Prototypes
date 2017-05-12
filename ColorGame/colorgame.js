@@ -3,10 +3,12 @@ c.onclick = handleClick;
 var ctx = c.getContext("2d");
 var SQ_SIZE = 50;
 var GRID_SIZE = 8;
+var score = 0;
 
 var array = [[],[],[],[],[],[],[],[]];
 var matchBuffer = [];
 drawSquares(array,true);
+updateScore();
 
 function handleClick(e){
 	var i = Math.floor((e.x - 8)/SQ_SIZE);
@@ -16,8 +18,20 @@ function handleClick(e){
 		fillIn();
 		matchBuffer = [];
 		drawSquares(array,false);
+		updateScore();
 	}
 	checkLoss();
+}
+
+function updateScore(){
+	ctx.beginPath();
+	ctx.fillStyle = "white";
+	ctx.rect(410,0,100,50);
+	ctx.fill();
+	ctx.font = "12px Arial";
+	ctx.fillStyle = "green";
+	ctx.fillText("Score:",410,20);
+	ctx.fillText(score,410,40);
 }
 
 function checkLoss(){
@@ -61,6 +75,7 @@ function clearMatches(i, j, color){
 	console.log("calling clearMatches("+i+","+j+") with color " + numToColorString(color));
 	if(!bufferHasValue(i,j)){
 		if(array[i][j] == color){
+			score += 10;
 			matchBuffer.push([i,j]);
 			array[i][j] = -1;
 			if(i>0){

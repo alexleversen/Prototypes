@@ -3,6 +3,7 @@ c.onclick = handleClick;
 var ctx = c.getContext("2d");
 var SQ_SIZE = 50;
 var GRID_SIZE = 8;
+var NUM_COLORS = 7;
 var score = 0;
 
 var array = [[],[],[],[],[],[],[],[]];
@@ -22,6 +23,9 @@ function clickNext(){
 function handleClick(e){
 	var i = Math.floor((e.x - 8)/SQ_SIZE);
 	var j = Math.floor((e.y - 8)/SQ_SIZE);
+	if(i >= GRID_SIZE || j >= GRID_SIZE){
+		return;
+	}
 	if(isMatchingSquareAdjacent(i,j)){
 		clearMatches(i,j, array[i][j]);
 		fillIn();
@@ -35,12 +39,12 @@ function handleClick(e){
 function updateScore(){
 	ctx.beginPath();
 	ctx.fillStyle = "white";
-	ctx.rect(410,0,100,50);
+	ctx.rect(SQ_SIZE * GRID_SIZE + 10,0,100,50);
 	ctx.fill();
 	ctx.font = "12px Arial";
 	ctx.fillStyle = "green";
-	ctx.fillText("Score:",410,20);
-	ctx.fillText(score,410,40);
+	ctx.fillText("Score:",SQ_SIZE * GRID_SIZE + 10,20);
+	ctx.fillText(score,SQ_SIZE * GRID_SIZE + 10,40);
 }
 
 function checkLoss(){
@@ -57,7 +61,7 @@ function checkLoss(){
 function lose(){
 	ctx.font = "30px Arial";
 	ctx.fillStyle = "black";
-	ctx.fillText("GAME OVER",110,210);
+	ctx.fillText("GAME OVER",window.innerWidth / 2 - 90,window.innerHeight / 2 - 15);
 }
 
 function isMatchingSquareAdjacent(i,j){
@@ -81,7 +85,6 @@ function isMatchingSquareAdjacent(i,j){
 }
 
 function clearMatches(i, j, color){
-	console.log("calling clearMatches("+i+","+j+") with color " + numToColorString(color));
 	if(!bufferHasValue(i,j)){
 		if(array[i][j] == color){
 			score += 10;
@@ -134,22 +137,45 @@ function drawSquares(array, random){
 	for(i = 0; i < GRID_SIZE; i ++) {
 		for(j = 0; j < GRID_SIZE; j++){
 			if(random == true){
-				array[i].push(randInt(6));
+				array[i].push(randInt(NUM_COLORS));
 			}
 			if(array[i][j] == -1){
-				array[i][j] = randInt(6);
+				array[i][j] = randInt(NUM_COLORS);
 			}
-			drawSquare(i,j,array[i][j]);
+			var drawMethod = getDrawMethodForNumber(array[i][j]);
+			drawSquare(i,j,-1); // Clear square before drawing
+			drawMethod(i,j,array[i][j]);
 		}
+	}
+}
+
+function getDrawMethodForNumber(n){
+	switch(n){
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+			return drawSquare;
+		case 6:
+			return drawCircle;
+		default:
+			return drawSquare;
 	}
 }
 
 function drawSquare(i,j,num){
 	ctx.beginPath();
-	ctx.rect(i * SQ_SIZE, j * SQ_SIZE, SQ_SIZE, SQ_SIZE);
-	ctx.strokeStyle = "black";
+	ctx.rect(i * SQ_SIZE + 1, j * SQ_SIZE + 1, SQ_SIZE - 2, SQ_SIZE - 2);
 	ctx.fillStyle = numToColorString(num);
-	ctx.stroke();
+	ctx.fill();
+}
+
+function drawCircle(i,j,num) {
+	ctx.beginPath();
+	ctx.arc(i * SQ_SIZE + 0.5 * SQ_SIZE, j * SQ_SIZE + 0.5 * SQ_SIZE, 0.5 * SQ_SIZE - 1, 0, 2 * Math.PI);
+	ctx.fillStyle = "pink";
 	ctx.fill();
 }
 
